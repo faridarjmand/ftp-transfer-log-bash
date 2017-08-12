@@ -2,6 +2,8 @@
 
 # This Script use for Transfer File witch FTP
 
+## Created By.Farid Arjmand ##
+
 ##############################
 ########## Variable ##########
 ##############################
