@@ -12,7 +12,7 @@ host=127.0.0.1
 username=testuser
 password=testpass
 format="*.log"
-datee=`date +%Y-%m-%d-%H:%M`
+date=`date +%Y-%m-%d-%H:%M`
 
 red='\033[0;31m'
 green='\033[0;32m'
@@ -27,12 +27,12 @@ check ()
         if [ "$?" == "0" ];then
                 echo -e ${green}"Done"${nc}
         else
-                echo -e ${red}"Error"${nc}
+                echo -e ${red}"Error !!"${nc}
         fi
 }
 
 clear
-mkdir $datee
+mkdir $date
 numberlog=`ls $format | wc -l | awk ' {print $1} '`
 ls -1 $format | awk '{ print length, $0 }' | sort -n | awk '{print $2}' > listfile.txt
 
@@ -46,7 +46,6 @@ do
         else
                 echo -e $file ${red}'Empty!'${nc}
                 rm -rf $file
-                sleep 2
         fi
 done
 
@@ -59,12 +58,12 @@ check
 ftp -n -i $host << EOT
 ascii
 user $username $password
-mkdir $datee
-cd $datee
+mkdir $date
+cd $date
 mput $format.gz
 put checksum.txt
-!mv $format.gz $datee/
-!cp checksum.txt $datee/
+!mv $format.gz $date/
+!cp checksum.txt $date/
 mget $format.gz
 bye
 EOT
