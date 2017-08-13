@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This Script use for Transfer File witch FTP
+# This Script use for Transfer File witch FTP ( Tested in Solaris )
 
 ## Created By.Farid Arjmand ##
 
