@@ -14,8 +14,8 @@ password=testpass
 format="*.log"
 date=`date +%Y-%m-%d-%H:%M`
 
-red='\033[0;31m'
-green='\033[0;32m'
+red='\033[0;91m'
+green='\033[0;92m'
 nc='\033[0m'
 
 ##############################
