@@ -1,11 +1,10 @@
-# This Script use for Auto Transfer Log with FTP ( Tested in Solaris )
-
-## Created By.Farid Arjmand ##
-
-
                         ################################# In BASH ##################################
 
 #!/bin/bash
+
+# This Script use for Auto Transfer Log with FTP ( Tested in Solaris )
+
+## Created By.Farid Arjmand ##
 
 ##############################
 ########## Variable ##########
