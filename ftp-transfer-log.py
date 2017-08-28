@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+# This Script use for Auto Transfer Log with FTP
+
+## Created By.Farid Arjmand ##
+
+##############################
+########## Modules ###########
+##############################
+
 import os
 import sys
 import gzip
@@ -84,3 +92,7 @@ for i in listlog:
 shutil.copy('checksum.txt', date)
 
 ftp.quit()
+
+#############################
+############ END ############
+#############################
