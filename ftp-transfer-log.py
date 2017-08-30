@@ -4,15 +4,13 @@
 
 ## Created By.Farid Arjmand ##
 
-##############################
-########## Modules ###########
-##############################
-
 import os
 import sys
 import gzip
+import socket
 import shutil
 import hashlib
+import difflib
 from ftplib import FTP
 from time import strftime
 
@@ -20,14 +18,15 @@ from time import strftime
 ########## Variable ##########
 ##############################
 
-host='127.0.0.1'
-username='testuser'
-password='testpass'
+host='172.16.1.151'
+username='test'
+password='!QAZ2wsx3edc'
 
 format = ".log"
 date = strftime("%Y-%m-%d-%H:%M")
 
 listlog = []
+ftplist = []
 
 ###############################
 ########## Functions ##########
@@ -41,12 +40,22 @@ def checksum(j):
 	sys.stdout.close()
 	sys.stdout = temp
 
+def checksum_ftp(ii):
+	temp = sys.stdout
+	sys.stdout = open('checksum_ftp.txt', 'a')
+	hash = hashlib.md5(open(ii, 'rb').read()).hexdigest()
+	print(ii, hash)
+	sys.stdout.close()
+	sys.stdout = temp
+	os.remove(ii)
+
 def compress(i):
 	global j
 	j = []
 	j.append(str(i))
 	j.append('.gz')
 	j = ''.join(j)
+	ftplist.append(j)
 	infile = open(i, 'rb')
 	outfile = gzip.open(j, 'wb')
 	outfile.writelines(infile)
@@ -57,15 +66,33 @@ def ftp_send(j):
 	ftp.storbinary('STOR %s' % j, open(j, 'rb'))
 	shutil.move(j, date)
 
-def ftp_recive(jj):
-	ftp.cwd('..')
-	ftp.retrbinary('RETR %s' % jj,  open(jj, 'wb').write)
+def ftp_recive(ii):
+	ftp.retrbinary('RETR %s' % ii,  open(ii, 'wb').write)
 
 def ftp_login(date):
 	global ftp
-	ftp = FTP(host,username,password)
-	ftp.mkd(date)
-	ftp.cwd(date)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	result = sock.connect_ex((host, 21))
+	if result == 0:
+		ftp = FTP(host,username,password)
+		ftp.mkd(date)
+		ftp.cwd(date)
+	else:
+		print("Can't Connect To Server")
+		exit()
+
+def remove_checksum():
+	for check in os.listdir("."):
+		if check.startswith("checksum"):
+			os.remove(check)
+
+def diff_checksum():
+	diff = difflib.ndiff(open('checksum.txt').readlines(), open('checksum_ftp.txt').readlines())
+	try:
+		while 1:
+			print diff.next(),
+	except:
+		pass
 
 ##############################
 ############ Main ############
@@ -88,11 +115,17 @@ for i in listlog:
 			ftp_send(j)
 		os.remove(i)
 
-#ftp.storbinary('STOR checksum.txt', open('checksum.txt', 'rb'))
+ftp.storbinary('STOR checksum.txt', open('checksum.txt', 'rb'))
 shutil.copy('checksum.txt', date)
 
-ftp.quit()
+for ii in ftplist:
+	ftp_recive(ii)
+	checksum_ftp(ii)
 
-#############################
-############ END ############
-#############################
+ftp.quit()
+diff_checksum()
+remove_checksum()
+
+##############################
+############ END #############
+##############################
