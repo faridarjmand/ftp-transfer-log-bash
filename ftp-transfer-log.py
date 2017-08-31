@@ -21,6 +21,7 @@ from time import strftime
 host='172.16.1.151'
 username='test'
 password='!QAZ2wsx3edc'
+port= 21
 
 format = ".log"
 date = strftime("%Y-%m-%d-%H:%M")
