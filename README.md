@@ -9,6 +9,10 @@ In BASH
 ```sh
 #!/bin/bash
 
+# This Script use for Auto Transfer Log with FTP ( Tested in Solaris )
+
+## Created By.Farid Arjmand ##
+
 ##############################
 ########## Variable ##########
 ##############################
@@ -16,7 +20,6 @@ In BASH
 host=127.0.0.1
 username=testuser
 password=testpass
-
 format="*.log"
 date=`date +%Y-%m-%d-%H:%M`
 
@@ -30,29 +33,25 @@ nc='\033[0m'
 
 check ()
 {
-      if [ "$?" == "0" ];then
-            echo -e ${green}"Done"${nc}
-      else
-            echo -e ${red}"Error !!"${nc}
-      fi
+        if [ "$?" == "0" ];then
+                echo -e ${green}"Done"${nc}
+        else
+                echo -e ${red}"Error !!"${nc}
+        fi
 }
 
 clear
 mkdir $date
-numberlog=`ls $format | wc -l | awk ' {print $1} '`
-ls -1 $format | awk '{ print length, $0 }' | sort -n | awk '{print $2}' > listfile.txt
 
-for (( i=1; i<=$numberlog; i++ ))
-do
-      file=`awk 'NR == '$i' {print $1}' listfile.txt`
-      report=`du $file |  awk ' {print $1} '`
-      if [ "$report" != "0" ];then
-            gzip $file
-            cksum "$file.gz" >> checksum.txt
-      else
-            echo -e $file ${red}'Empty!'${nc}
-            rm -rf $file
-      fi
+for file in `ls $format`;do
+        report=`du $file |  awk ' {print $1} '`
+        if [ "$report" != "0" ];then
+                gzip $file
+                cksum "$file.gz" >> checksum.txt
+        else
+                echo -e $file ${red}'Empty!'${nc}
+                rm -rf $file
+        fi
 done
 
 check
@@ -80,21 +79,14 @@ check
 ####### Data Integrity #######
 ##############################
 
-numberlog=`ls $format.gz | wc -l | awk ' {print $1} '`
-ls -1 $format.gz | awk '{ print length, $0 }' | sort -n | awk '{print $2}' > listfile-ftp.txt
-
-for (( i=1; i<=$numberlog; i++ ))
-do
-      file=`awk 'NR == '$i' {print $1}' listfile-ftp.txt`
-      cksum "$file" >> checksum-ftp.txt
+for file in `ls $format.gz`;do
+        cksum "$file" >> checksum-ftp.txt
 done
 
 diff checksum.txt checksum-ftp.txt
 
-check
-
 if [ "$?" == "0" ];then
-      rm $format.gz checksum-ftp.txt checksum.txt listfile.txt listfile-ftp.txt
+        rm $format.gz checksum-ftp.txt checksum.txt listfile.txt listfile-ftp.txt
 fi
 
 check
