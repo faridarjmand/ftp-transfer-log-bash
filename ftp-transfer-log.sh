@@ -33,12 +33,8 @@ check ()
 
 clear
 mkdir $date
-numberlog=`ls $format | wc -l | awk ' {print $1} '`
-ls -1 $format | awk '{ print length, $0 }' | sort -n | awk '{print $2}' > listfile.txt
 
-for (( i=1; i<=$numberlog; i++ ))
-do
-        file=`awk 'NR == '$i' {print $1}' listfile.txt`
+for file in `ls $format`;do
         report=`du $file |  awk ' {print $1} '`
         if [ "$report" != "0" ];then
                 gzip $file
@@ -74,18 +70,11 @@ check
 ####### Data Integrity #######
 ##############################
 
-numberlog=`ls $format.gz | wc -l | awk ' {print $1} '`
-ls -1 $format.gz | awk '{ print length, $0 }' | sort -n | awk '{print $2}' > listfile-ftp.txt
-
-for (( i=1; i<=$numberlog; i++ ))
-do
-        file=`awk 'NR == '$i' {print $1}' listfile-ftp.txt`
+for file in `ls $format.gz`;do
         cksum "$file" >> checksum-ftp.txt
 done
 
 diff checksum.txt checksum-ftp.txt
-
-check
 
 if [ "$?" == "0" ];then
         rm $format.gz checksum-ftp.txt checksum.txt listfile.txt listfile-ftp.txt
